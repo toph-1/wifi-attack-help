@@ -1,0 +1,25 @@
+#!/bin/bash
+# test-password.sh
+
+SSID="your-wifi-name"
+PASSWORD="your-known-password"
+INTERFACE=$(nmcli device status | awk '/wifi/ {print $1}' | head -1)
+
+echo "Testing connection to $SSID..."
+
+# Disconnect first
+nmcli device disconnect "$INTERFACE"
+sleep 2
+
+# Try to connect
+nmcli device wifi connect "$SSID" password "$PASSWORD"
+
+# Wait and check
+sleep 5
+
+# Check connection
+echo "Current SSID: $(iwgetid -r)"
+echo "IP Address: $(ip -4 addr show "$INTERFACE" | grep -oP '(?<=inet\s)\d+(\.\d+){3}')"
+
+# Show connection status
+nmcli device status
